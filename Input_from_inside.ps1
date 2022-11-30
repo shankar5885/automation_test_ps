@@ -478,4 +478,17 @@ elseif (($deallocatedInstances) -and ($Action -eq "Start"))
     }
 }
 #### End of updating virtual machines power state
+###############################################################
+#Daily remove automation script
+$subscription = 'aa748e82-e0df-42e3-ac20-f30b6a5077e0'
+Add-AzAccount -Identity
+$null = Set-AzContext -SubscriptionId $subscription
+Write-Output "Listing the Resources before deletion...SUB001"
+Get-AzResource | Where ResourceGroupName -NE "DoNotDelete" | FT ResourceName, ResourceType, ResourceGroupName
+Write-Output "Starting Removal of Resource Groups apart from DoNotDelete RG...SUB001"
+Get-AzResourceGroup | Where ResourceGroupName -NE "DoNotDelete" | Remove-AzResourceGroup -Force
+Write-Output "Completed the Removal of RG's apart from DoNotDelete...SUB001"
+Write-Output "Proceeding with DoNotDelete RG Resources apart from required stuff...SUB001"
+Get-AzResource | Where {($_.Name -NE "DailyRemoveAutomationAccount") -and ($_.Name -NE "DailyRemoveAutomationAccount/Deal_webhookdata_with_py") -and ($_.Name -NE "DailyRemoveAutomationAccount/delete_RG_RunBook") -and ($_.Name -NE "DailyRemoveAutomationAccount/test01") -and ($_.Name -NE "DailyRemoveAutomationAccount/testpy")} | Remove-AzResource -Force
+Write-Output "Task Completed for $subscription"
 
